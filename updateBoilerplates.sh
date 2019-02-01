@@ -87,7 +87,7 @@ function _commit_updates()
         printf "Added a new commit: Updated packages on $gCurrentDate @ $gCurrentTime\n" >> "$gLogPath"
     fi
 
-    $($gGitCommand push origin master -f)
+    $($gGitCommand push origin master)
     if [[ $? -ne 0 ]];
       then
         printf 'ERROR! Unable to push new git commit!\n' >> "$gLogPath"
