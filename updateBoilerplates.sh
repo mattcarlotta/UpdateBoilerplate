@@ -47,7 +47,7 @@ function _begin_session()
 }
 
 #===============================================================================##
-## COMMIT UPDATES -- PUSHES UPDATES TO GITHUB                                    #
+## COMMIT UPDATES -- INSTALLS NEW DEPENDENCIES TO LOCAL DIRECTORY                #
 ##==============================================================================##
 function _install_updates()
 {
