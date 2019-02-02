@@ -43,7 +43,7 @@ gCurrentTime=$(/bin/date +"%I:%M %p")
 ##==============================================================================##
 function _install_updates()
 {
-  $($gNPMCommand install > /dev/null 2>&1)
+  $($gNPMCommand install)
   if [[ $? -ne 0 ]]; then
       printf "ERROR! Unable to install new package dependencies\n\n! $gCurrentDir \n" >> "$gLogPath"
     else
@@ -83,7 +83,6 @@ function _commit_updates()
           printf "Successfully pushed new package dependencies to github!\n" >> "$gLogPath"
         fi
     fi
-    # printf "Commited changes and pushed to github!\n\n" >> "$gLogPath"
     else
       printf "Nothing to commit.\n\n" >> "$gLogPath"
   fi
