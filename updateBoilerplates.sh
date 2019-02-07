@@ -2,7 +2,7 @@
 #
 # Script to automatically update Webpack-React-Boilerplate
 #
-# Version 0.0.2 - Copyright (c) 2019 by Matt Carlotta
+# Version 0.0.3 - Copyright (c) 2019 by Matt Carlotta
 #
 
 #===============================================================================##
@@ -38,6 +38,9 @@ gCurrentDate=$(/bin/date +"%m/%d/%Y")
 # current time
 gCurrentTime=$(/bin/date +"%I:%M %p")
 
+# if ctrl+c, then exit script
+trap '{ exit 0; }' INT
+
 #===============================================================================##
 ## INSTALL UPDATES -- INSTALLS NEW DEPENDENCIES TO LOCAL DIRECTORY               #
 ##==============================================================================##
@@ -45,7 +48,7 @@ function _install_updates()
 {
   $($gNPMCommand install)
   if [[ $? -ne 0 ]]; then
-      printf "ERROR! Unable to install new package dependencies\n\n! $gCurrentDir \n" >> "$gLogPath"
+      printf "ERROR! Unable to install new package dependencies! $gCurrentDir \n" >> "$gLogPath"
     else
       printf "Installed new package dependencies $gCurrentDir!\n" >> "$gLogPath"
 
@@ -64,8 +67,7 @@ function _commit_updates()
 {
   local checkstatus=$($gGitCommand status)
 
-  if [[ ! "$checkstatus" =~ "Your branch is up to date" ]]; then
-
+  if [[ ! "$checkstatus" =~ "up to date" ]]; then
     $($gGitCommand add .)
     printf "Added git changes to current branch\n" >> "$gLogPath"
 
@@ -81,10 +83,11 @@ function _commit_updates()
           _end_session
           else
           printf "Successfully pushed new package dependencies to github!\n" >> "$gLogPath"
+          _install_updates
         fi
     fi
     else
-      printf "Nothing to commit.\n\n" >> "$gLogPath"
+      printf "Nothing to commit.\n" >> "$gLogPath"
   fi
 }
 
@@ -163,7 +166,6 @@ function _set_current_dir()
     _check_for_outdated_deps
     _update_deps
     _commit_updates
-    _install_updates
     _close_current_dir_log
   done
 }
