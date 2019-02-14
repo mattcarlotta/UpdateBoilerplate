@@ -2,7 +2,7 @@
 #
 # Script to automatically update Webpack-React-Boilerplate
 #
-# Version 0.0.3 - Copyright (c) 2019 by Matt Carlotta
+# Version 0.0.4 - Copyright (c) 2019 by Matt Carlotta
 #
 
 #===============================================================================##
@@ -46,18 +46,14 @@ trap '{ exit 0; }' INT
 ##==============================================================================##
 function _install_updates()
 {
-  $($gNPMCommand install)
-  if [[ $? -ne 0 ]]; then
-      printf "ERROR! Unable to install new package dependencies! $gCurrentDir \n" >> "$gLogPath"
-    else
-      printf "Installed new package dependencies $gCurrentDir!\n" >> "$gLogPath"
+  $($gNPMCommand i > /dev/null 2>&1)
+    printf "Installed new package dependencies $gCurrentDir!\n" >> "$gLogPath"
 
-      if [[ "$gCount" -eq "3" ]]; then
-        cd "client"
-        ((gCount++))
-        _install_updates
-      fi
-  fi
+    if [[ "$gCount" -eq "3" ]]; then
+      cd "client"
+      ((gCount++))
+      _install_updates
+    fi
 }
 
 #===============================================================================##
@@ -67,7 +63,7 @@ function _commit_updates()
 {
   local checkstatus=$($gGitCommand status)
 
-  if [[ ! "$checkstatus" =~ "up to date" ]]; then
+  if [[ "$checkstatus" =~ "Changes not staged for commit" ]]; then
     $($gGitCommand add .)
     printf "Added git changes to current branch\n" >> "$gLogPath"
 
