@@ -2,7 +2,7 @@
 #
 # Script to automatically update Webpack-React-Boilerplate
 #
-# Version 0.0.4 - Copyright (c) 2019 by Matt Carlotta
+# Version 0.0.5 - Copyright (c) 2019 by Matt Carlotta
 #
 
 #===============================================================================##
@@ -18,10 +18,11 @@ gNCUCommand="/usr/bin/ncu"
 gDocumentsPath="$HOME/Documents"
 gMasterPlate="$gDocumentsPath/boilerplate-master"
 gHotPlate="$gDocumentsPath/boilerplate-hot"
+gSSRPlate="$gDocumentsPath/boilerplate-ssr"
 gFullStackPlate="$gDocumentsPath/boilerplate-fullstack"
 
 # directory list
-gDirList=($gMasterPlate $gHotPlate $gFullStackPlate)
+gDirList=($gMasterPlate $gHotPlate $gSSRPlate $gFullStackPlate)
 
 # current directory list
 gCurrentDir=""
@@ -47,9 +48,9 @@ trap '{ exit 0; }' INT
 function _install_updates()
 {
   $($gNPMCommand i > /dev/null 2>&1)
-    printf "Installed new package dependencies $gCurrentDir!\n" > "$gLogPath"
+    printf "Installed new package dependencies $gCurrentDir!\n" >> "$gLogPath"
 
-    if [[ "$gCount" -eq "3" ]]; then
+    if [[ "$gCount" -eq "4" ]]; then
       cd "client"
       ((gCount++))
       _install_updates
@@ -65,25 +66,25 @@ function _commit_updates()
 
   if [[ "$checkstatus" =~ "Changes not staged for commit" ]]; then
     $($gGitCommand add .)
-    printf "Added git changes to current branch\n" > "$gLogPath"
+    printf "Added git changes to current branch\n" >> "$gLogPath"
 
     $($gGitCommand commit -m "Updated packages on $gCurrentDate @ $gCurrentTime" > /dev/null 2>&1)
     if [[ $? -ne 0 ]]; then
-        printf 'ERROR! Unable to commit new updates!\n' > "$gLogPath"
+        printf 'ERROR! Unable to commit new updates!\n' >> "$gLogPath"
       else
-        printf "Added a new commit: Updated packages on $gCurrentDate @ $gCurrentTime\n" > "$gLogPath"
+        printf "Added a new commit: Updated packages on $gCurrentDate @ $gCurrentTime\n" >> "$gLogPath"
 
         $($gGitCommand push)
         if [[ $? -ne 0 ]]; then
-          printf "ERROR! Unable to push new git commit! $gCurrentDir \n" > "$gLogPath"
+          printf "ERROR! Unable to push new git commit! $gCurrentDir \n" >> "$gLogPath"
           _end_session
           else
-          printf "Successfully pushed new package dependencies to github!\n" > "$gLogPath"
+          printf "Successfully pushed new package dependencies to github!\n" >> "$gLogPath"
           _install_updates
         fi
     fi
     else
-      printf "Nothing to commit.\n" > "$gLogPath"
+      printf "Nothing to commit.\n" >> "$gLogPath"
   fi
 }
 
@@ -95,9 +96,9 @@ function _check_for_outdated_deps()
   local outdatedpackages=$($gNPMCommand outdated)
 
   if [ ! -z "$outdatedpackages" ]; then
-    printf "$outdatedpackages\n\n" > "$gLogPath"
+    printf "$outdatedpackages\n\n" >> "$gLogPath"
     else
-      printf "All package dependencies are up-to-date! :)\n\n" > "$gLogPath"
+      printf "All package dependencies are up-to-date! :)\n\n" >> "$gLogPath"
   fi
 }
 
@@ -106,7 +107,7 @@ function _check_for_outdated_deps()
 ##==============================================================================##
 function update_fullstack_client_deps()
 {
-  if [[ "$gCount" -eq "2" ]]; then
+  if [[ "$gCount" -eq "3" ]]; then
     cd "client"
     ((gCount++))
     _check_for_outdated_deps
@@ -123,9 +124,9 @@ function _update_deps()
   local updatedpackages=$($gNCUCommand -u -a -x bcrypt)
 
   if [[ ! "$updatedpackages" =~ "All dependencies match the latest package versions" ]]; then
-    printf "$updatedpackages\n\n" > "$gLogPath"
+    printf "$updatedpackages\n\n" >> "$gLogPath"
     else
-      printf "All dependencies match the latest package versions! :)\n\n" > "$gLogPath"
+      printf "All dependencies match the latest package versions! :)\n\n" >> "$gLogPath"
   fi
   update_fullstack_client_deps
 
@@ -136,8 +137,8 @@ function _update_deps()
 ##==============================================================================##
 function _close_current_dir_log()
 {
-  printf "\nClosing $gCurrentDir\n" > "$gLogPath"
-  printf "\n%s-----------------------------------------------------------------------------------------------------\n" > "$gLogPath"
+  printf "\nClosing $gCurrentDir\n" >> "$gLogPath"
+  printf "\n%s-----------------------------------------------------------------------------------------------------\n" >> "$gLogPath"
 }
 
 #===============================================================================##
@@ -145,7 +146,7 @@ function _close_current_dir_log()
 ##==============================================================================##
 function _update_current_dir_log()
 {
-  printf "\nUpdating $gCurrentDir\n\n" > "$gLogPath"
+  printf "\nUpdating $gCurrentDir\n\n" >> "$gLogPath"
 }
 
 #===============================================================================##
@@ -171,8 +172,8 @@ function _set_current_dir()
 ##==============================================================================##
 function _end_session()
 {
-  printf "%s------------------------------------ END OF SESSION -------------------------------------------------\n" > "$gLogPath"
-  printf "%s-----------------------------------------------------------------------------------------------------\n\n" > "$gLogPath"
+  printf "%s------------------------------------ END OF SESSION -------------------------------------------------\n" >> "$gLogPath"
+  printf "%s-----------------------------------------------------------------------------------------------------\n\n" >> "$gLogPath"
   exit 0
 }
 
@@ -182,8 +183,8 @@ function _end_session()
 function _begin_session()
 {
   printf "%s-----------------------------------------------------------------------------------------------------\n" > "$gLogPath"
-  printf "%s------------------------------------ SESSION STARTED ON $gCurrentDate ----------------------------------\n" > "$gLogPath"
-  printf "%s-----------------------------------------------------------------------------------------------------\n" > "$gLogPath"
+  printf "%s------------------------------------ SESSION STARTED ON $gCurrentDate ----------------------------------\n" >> "$gLogPath"
+  printf "%s-----------------------------------------------------------------------------------------------------\n" >> "$gLogPath"
 
   _set_current_dir
 }
