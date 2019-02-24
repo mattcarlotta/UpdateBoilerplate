@@ -2,7 +2,7 @@
 #
 # Script to automatically update Webpack-React-Boilerplate
 #
-# Version 0.0.5 - Copyright (c) 2019 by Matt Carlotta
+# Version 0.0.6 - Copyright (c) 2019 by Matt Carlotta
 #
 
 #===============================================================================##
@@ -47,7 +47,7 @@ trap '{ exit 0; }' INT
 ##==============================================================================##
 function _install_updates()
 {
-  $($gNPMCommand i > /dev/null 2>&1)
+  $($gNPMCommand i)
     printf "Installed new package dependencies $gCurrentDir!\n" >> "$gLogPath"
 
     if [[ "$gCount" -eq "4" ]]; then
@@ -64,11 +64,11 @@ function _commit_updates()
 {
   local checkstatus=$($gGitCommand status)
 
-  if [[ "$checkstatus" =~ "Changes not staged for commit" ]]; then
+  if [[ $checkstatus == *"Changes not staged for commit"* ]]; then
     $($gGitCommand add .)
     printf "Added git changes to current branch\n" >> "$gLogPath"
 
-    $($gGitCommand commit -m "Updated packages on $gCurrentDate @ $gCurrentTime" > /dev/null 2>&1)
+    $($gGitCommand commit -m "Updated packages on $gCurrentDate @ $gCurrentTime")
     if [[ $? -ne 0 ]]; then
         printf 'ERROR! Unable to commit new updates!\n' >> "$gLogPath"
       else
@@ -123,7 +123,7 @@ function _update_deps()
 {
   local updatedpackages=$($gNCUCommand -u -a -x bcrypt)
 
-  if [[ ! "$updatedpackages" =~ "All dependencies match the latest package versions" ]]; then
+  if [[ ! $updatedpackages == *"All dependencies match the latest package versions"* ]]; then
     printf "$updatedpackages\n\n" >> "$gLogPath"
     else
       printf "All dependencies match the latest package versions! :)\n\n" >> "$gLogPath"
