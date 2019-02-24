@@ -2,7 +2,7 @@
 #
 # Script to automatically update Webpack-React-Boilerplate
 #
-# Version 0.0.6 - Copyright (c) 2019 by Matt Carlotta
+# Version 0.0.7 - Copyright (c) 2019 by Matt Carlotta
 #
 
 #===============================================================================##
@@ -68,7 +68,7 @@ function _commit_updates()
     $($gGitCommand add .)
     printf "Added git changes to current branch\n" >> "$gLogPath"
 
-    $($gGitCommand commit -m "Updated packages on $gCurrentDate @ $gCurrentTime")
+    $($gGitCommand commit -m "Updated packages on $gCurrentDate @ $gCurrentTime" > /dev/null 2>&1)
     if [[ $? -ne 0 ]]; then
         printf 'ERROR! Unable to commit new updates!\n' >> "$gLogPath"
       else
