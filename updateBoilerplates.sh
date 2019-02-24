@@ -2,7 +2,7 @@
 #
 # Script to automatically update Webpack-React-Boilerplate
 #
-# Version 0.0.7 - Copyright (c) 2019 by Matt Carlotta
+# Version 0.0.8 - Copyright (c) 2019 by Matt Carlotta
 #
 
 #===============================================================================##
@@ -50,7 +50,7 @@ function _install_updates()
   $($gNPMCommand i)
     printf "Installed new package dependencies $gCurrentDir!\n" >> "$gLogPath"
 
-    if [[ "$gCount" -eq "4" ]]; then
+    if [[ $gCount -eq 4 ]]; then
       cd "client"
       ((gCount++))
       _install_updates
@@ -95,7 +95,7 @@ function _check_for_outdated_deps()
 {
   local outdatedpackages=$($gNPMCommand outdated)
 
-  if [ ! -z "$outdatedpackages" ]; then
+  if [[ ! $outdatedpackages ]]; then
     printf "$outdatedpackages\n\n" >> "$gLogPath"
     else
       printf "All package dependencies are up-to-date! :)\n\n" >> "$gLogPath"
@@ -107,7 +107,7 @@ function _check_for_outdated_deps()
 ##==============================================================================##
 function update_fullstack_client_deps()
 {
-  if [[ "$gCount" -eq "3" ]]; then
+  if [[ $gCount -eq 3 ]]; then
     cd "client"
     ((gCount++))
     _check_for_outdated_deps
@@ -124,9 +124,7 @@ function _update_deps()
   local updatedpackages=$($gNCUCommand -u -a -x bcrypt)
 
   if [[ ! $updatedpackages == *"All dependencies match the latest package versions"* ]]; then
-    printf "$updatedpackages\n\n" >> "$gLogPath"
-    else
-      printf "All dependencies match the latest package versions! :)\n\n" >> "$gLogPath"
+      printf "$updatedpackages\n\n" >> "$gLogPath"
   fi
   update_fullstack_client_deps
 
