@@ -2,7 +2,7 @@
 #
 # Script to automatically update Webpack-React-Boilerplate
 #
-# Version 0.0.8 - Copyright (c) 2019 by Matt Carlotta
+# Version 0.0.9 - Copyright (c) 2019 by Matt Carlotta
 #
 
 #===============================================================================##
@@ -47,7 +47,7 @@ trap '{ exit 0; }' INT
 ##==============================================================================##
 function _install_updates()
 {
-  $($gNPMCommand i)
+  $($gNPMCommand i > /dev/null 2>&1)
     printf "Installed new package dependencies $gCurrentDir!\n" >> "$gLogPath"
 
     if [[ $gCount -eq 4 ]]; then
@@ -64,25 +64,23 @@ function _commit_updates()
 {
   local checkstatus=$($gGitCommand status)
 
-  if [[ $checkstatus == *"Changes not staged for commit"* ]]; then
-    $($gGitCommand add .)
-    printf "Added git changes to current branch\n" >> "$gLogPath"
+  if [[ ${checkstatus} == *"Changes not staged for commit"* ]];
+    then
+      $($gGitCommand add .)
+      printf "Added git changes to current branch\n" >> "$gLogPath"
 
-    $($gGitCommand commit -m "Updated packages on $gCurrentDate @ $gCurrentTime" > /dev/null 2>&1)
-    if [[ $? -ne 0 ]]; then
-        printf 'ERROR! Unable to commit new updates!\n' >> "$gLogPath"
-      else
-        printf "Added a new commit: Updated packages on $gCurrentDate @ $gCurrentTime\n" >> "$gLogPath"
+      $($gGitCommand commit -m "Updated packages on $gCurrentDate @ $gCurrentTime" > /dev/null 2>&1)
+      printf "Added a new commit: Updated packages on $gCurrentDate @ $gCurrentTime\n" >> "$gLogPath"
 
-        $($gGitCommand push)
-        if [[ $? -ne 0 ]]; then
-          printf "ERROR! Unable to push new git commit! $gCurrentDir \n" >> "$gLogPath"
+      $($gGitCommand push)
+      if [[ $? -ne 0 ]];
+        then
+          printf "ERROR! Unable to push new git commit! $gCurrentDir - reason: $? \n" >> "$gLogPath"
           _end_session
-          else
+        else
           printf "Successfully pushed new package dependencies to github!\n" >> "$gLogPath"
           _install_updates
-        fi
-    fi
+      fi
     else
       printf "Nothing to commit.\n" >> "$gLogPath"
   fi
@@ -95,10 +93,11 @@ function _check_for_outdated_deps()
 {
   local outdatedpackages=$($gNPMCommand outdated)
 
-  if [[ ! $outdatedpackages ]]; then
-    printf "$outdatedpackages\n\n" >> "$gLogPath"
-    else
+  if [ -z "$outdatedpackages" ];
+    then
       printf "All package dependencies are up-to-date! :)\n\n" >> "$gLogPath"
+    else
+      printf "$outdatedpackages\n\n" >> "$gLogPath"
   fi
 }
 
@@ -121,9 +120,9 @@ function update_fullstack_client_deps()
 ##==============================================================================##
 function _update_deps()
 {
-  local updatedpackages=$($gNCUCommand -u -a -x bcrypt)
+  local updatedpackages=$($gNPMCommand upgrade)
 
-  if [[ ! $updatedpackages == *"All dependencies match the latest package versions"* ]]; then
+  if [[ ${updatedpackages} != *"All dependencies match the latest package versions"* ]]; then
       printf "$updatedpackages\n\n" >> "$gLogPath"
   fi
   update_fullstack_client_deps
